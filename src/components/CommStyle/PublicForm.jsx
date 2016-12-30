@@ -119,7 +119,7 @@ function _PublicForm(props) {
     );
 }
 
-//包裹InputNumber 用纯函数组件来写有毒。。
+//包裹InputNumber 用无状态函数组件来写有毒。。
 class InputNumberWrapped extends React.Component {
 	render(){
 		const {
