@@ -1,8 +1,9 @@
 import React from 'react';
-import { DatePicker, Form, Input, Button, Icon, InputNumber, Popover, Select } from 'antd';
+import { DatePicker, Form, Input, Button, Icon, InputNumber, Popover, Select, Upload } from 'antd';
 import { connect } from 'dva';
 import { ColorPickerWrapped } from '../comm/colorPicker.jsx';
 
+const Option = Select.Option;
 const formItemLayout = {
 	labelCol: {span: 6},
 	wrapperCol: {span: 14}
@@ -18,6 +19,7 @@ const tailFormItemLayout = {
 const FormItem = Form.Item;
 const RangePicker = DatePicker.RangePicker;
 
+//样式！
 const styles = {
 	colorWrap: {
 		marginTop: '5px'
@@ -43,7 +45,30 @@ function _PublicForm(props) {
 	const { getFieldDecorator, validateFields, setFieldsValue, getFieldValue } = props.form;
 	const { pubFormState, dispatch } = props;
 
+	// const SelectBefore = (
+	// 	<Select defaultValue="0" style={{width: '80px'}}>
+	// 		<Option value="0">产品ID</Option>
+	// 		<Option value="1">供应商ID</Option>
+	// 		<Option value="2">aaaa</Option>
+	// 	</Select>
+	// );
+
+	const SelectBefore = getFieldDecorator(
+			'listType', {
+				rules: [{required: true, message: '请选择ID类型！~'}],
+				initialValue: '0'
+			}
+		)(
+			<Select style={{width: '80px'}}>
+				<Option value="0">产品ID</Option>
+				<Option value="1">供应商ID</Option>
+				<Option value="2">aaaa</Option>
+			</Select>
+		);
+
+
     return (
+			<div>
       <Form onSubmit={(e) => handleSubmit(e, validateFields)}>
 
         <FormItem {...formItemLayout} label="专场名称：">
@@ -105,17 +130,28 @@ function _PublicForm(props) {
         </FormItem>
 
         <FormItem {...formItemLayout} label="商品筛选">
-        	{getFieldDecorator('productList', {
+        	{getFieldDecorator('idList', {
 	        	initialValue: 0
 	          })(
-	          <ProductInputWrapped />
+	          <ProductInputWrapped addonBefore={SelectBefore} />
     		)}
         </FormItem>
+
+				<FormItem {...formItemLayout} label="入口图上传">
+					{getFieldDecorator('bannerImg', {
+						rules: [{type: "object", required: true, massage: "请上传图片！~"}]
+					})(
+						<Upload listType="picture" action="/api/upload/banner" accept="image/*">
+							<Button type="ghost"><Icon type="upload" /> 上传</Button>
+						</Upload>
+					)}
+				</FormItem>
 
         <FormItem {...tailFormItemLayout}>
           <Button type="primary" htmlType="submit">保存</Button>
         </FormItem>
       </Form>
+			</div>
     );
 }
 
@@ -132,8 +168,8 @@ class InputNumberWrapped extends React.Component {
 
 		return (
 			<div>
-				<Popover 
-					content={<p><Icon type="info-circle" />数值越大排得越前，相同数值的情况下，最新生成的拍前面~</p>}
+				<Popover
+					content={<p><Icon type="info-circle" /> 数值越大排得越前，相同数值的情况下，最新生成的拍前面~</p>}
 					title="提示"
 					placement="right"
 					trigger="hover"
@@ -141,7 +177,7 @@ class InputNumberWrapped extends React.Component {
 					<div style={{width: '80px'}}>
 						<InputNumber min={min} max={max} step={step} defaultValue={defaultValue} onChange={(v)=>onChange(v)} />
 					</div>
-				
+
 				</Popover>
 			</div>
 		);
@@ -152,14 +188,14 @@ class ProductInputWrapped extends React.Component {
 	render(){
 		return (
 			<div>
-				<Popover 
-					content={<p><Icon type="info-circle" />多个数值请用‘|’分隔</p>}
+				<Popover
+					content={<p><Icon type="info-circle" /> 多个数值请用‘|’分隔</p>}
 					title="提示"
 					placement="topLeft"
 					trigger="hover"
 				>
 					<div style={{width: '100%'}}>
-						<Input onChange={(e)=>this.props.onChange(e.target.value)}/>
+						<Input addonBefore={this.props.addonBefore} onChange={(e)=>this.props.onChange(e.target.value)}/>
 					</div>
 				</Popover>
 			</div>
@@ -172,7 +208,7 @@ class ProductInputWrapped extends React.Component {
 // 	console.log('func', props.onChange);
 // 	return (
 // 		<div>
-// 			<Popover 
+// 			<Popover
 // 				content={<p><Icon type="info-circle" />多个数值请用‘|’分隔</p>}
 // 				title="提示"
 // 				placement="topLeft"
@@ -202,7 +238,7 @@ function onFieldsChange(props, fields) {
 	const { dispatch } = props;
 	//当表格修改，记录表格state
 	dispatch({
-		type: 'commStyle/updPubFormState', 
+		type: 'commStyle/updPubFormState',
 		value: fields
 	});
 }
@@ -216,4 +252,3 @@ function mapStateToProps({commStyle:{pubFormState}}) {
 const PublicForm = Form.create({onFieldsChange})(_PublicForm);
 
 export default connect(mapStateToProps)(PublicForm);
-

@@ -1,4 +1,7 @@
 'use strict';
+
+const Form = require('formidable');
+
 const mock = {
 	total: 12,
 	current: 1,
@@ -120,6 +123,37 @@ module.exports = {
 	      });
 	    }, 500);
   	}
-  }
+  },
 
+	'POST /api/upload/banner': function (req, res) {
+		// console.log(req.body);
+
+		let form = new Form.IncomingForm();
+		form.encoding = 'utf-8';
+		form.uploadDir = 'public/upload'; //配置路劲
+		form.keepExtensions = true;	//保留扩展名
+		form.maxFieldsSize = 2 * 1024 * 1024; //不大于2M
+
+
+
+		form.parse(req, function(err, fields, files){
+			console.log('err', err);
+			console.log('fields', fields);
+			console.log('files', files);
+
+			// console.log(files);
+			// if(err){
+			// 	//失败
+			//
+			// 	res.end('err');
+			// 	return;
+			// }
+			// //成功
+			// res.end('success');
+		})
+
+		res.end();
+
+
+	}
 };

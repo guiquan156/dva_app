@@ -60,7 +60,7 @@ class ColorPicker extends React.Component {
 
 		return (
 			<div>
-		        <Trigger 
+		        <Trigger
 				    action={['click']}
 				    popup={this.getPicker()}
 				    popupAlign={popupAlign}
@@ -71,7 +71,7 @@ class ColorPicker extends React.Component {
 				  </Trigger>
 			</div>
 		);
-		
+
 	}
 
 	onChangeComplete(color, event) {
@@ -129,7 +129,7 @@ class ColorPickerWrapped extends React.Component {
 			        />
 		        </div>
 	    		<span style={styles.colorInfo}>{color ? this.state.color.hex : this.props.color}</span>
-	    		<p style={styles.colorTips}><Icon type="info-circle" />注意：目前不支持透明度~，默认颜色为白色！~</p>
+	    		<p style={styles.colorTips}><Icon type="info-circle" /> 注意：目前不支持透明度~，默认颜色为白色！~</p>
     		</div>
 		);
 	}
