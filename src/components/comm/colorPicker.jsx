@@ -128,8 +128,8 @@ class ColorPickerWrapped extends React.Component {
 			        	onChangeComplete={(color, event)=>this.onChangeComplete(color, event)}
 			        />
 		        </div>
-	    		<span style={styles.colorInfo}>{color ? this.state.color.hex : this.props.color}</span>
-	    		<p style={styles.colorTips}><Icon type="info-circle" /> 注意：目前不支持透明度~，默认颜色为白色！~</p>
+	    		<span style={styles.colorInfo}>{color && this.state.color.hex}</span>
+	    		<p style={styles.colorTips}><Icon type="info-circle" /> 注意：目前不支持透明度~</p>
     		</div>
 		);
 	}

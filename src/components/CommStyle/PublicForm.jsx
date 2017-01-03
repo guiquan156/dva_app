@@ -1,5 +1,5 @@
 import React from 'react';
-import { DatePicker, Form, Input, Button, Icon, InputNumber, Popover, Select, Upload } from 'antd';
+import { DatePicker, Form, Input, Button, Icon, InputNumber, Popover, Select, Upload, Modal, Switch, notification } from 'antd';
 import { connect } from 'dva';
 import { ColorPickerWrapped } from '../comm/colorPicker.jsx';
 
@@ -45,14 +45,7 @@ function _PublicForm(props) {
 	const { getFieldDecorator, validateFields, setFieldsValue, getFieldValue } = props.form;
 	const { pubFormState, dispatch } = props;
 
-	// const SelectBefore = (
-	// 	<Select defaultValue="0" style={{width: '80px'}}>
-	// 		<Option value="0">产品ID</Option>
-	// 		<Option value="1">供应商ID</Option>
-	// 		<Option value="2">aaaa</Option>
-	// 	</Select>
-	// );
-
+	//商品筛选下拉框
 	const SelectBefore = getFieldDecorator(
 			'listType', {
 				rules: [{required: true, message: '请选择ID类型！~'}],
@@ -66,10 +59,9 @@ function _PublicForm(props) {
 			</Select>
 		);
 
-
     return (
-			<div>
-      <Form onSubmit={(e) => handleSubmit(e, validateFields)}>
+		<div>
+      <Form onSubmit={(e) => handleSubmit(e, validateFields, dispatch, pubFormState)}>
 
         <FormItem {...formItemLayout} label="专场名称：">
           {getFieldDecorator('actName', {
@@ -89,32 +81,13 @@ function _PublicForm(props) {
           )}
         </FormItem>
 
-        <FormItem {...formItemLayout} label="开始时间">
-          {getFieldDecorator('startTime', {
-            rules: [
-            	{ type: 'object', required: true, message: '请选择活动的开始时间！~' }
-        	],
-          })(
-            <DatePicker showTime format="YYYY-MM-DD HH:mm:ss"/>
-          )}
-        </FormItem>
-        <FormItem {...formItemLayout} label="结束时间">
-          {getFieldDecorator('endTime', {
-            rules: [
-            	{ type: 'object', required: true, message: '请选择活动的结束时间！~' }
-        	],
-          })(
-            <DatePicker showTime format="YYYY-MM-DD HH:mm:ss"/>
-          )}
-        </FormItem>
-
         <FormItem {...formItemLayout} label="按钮颜色">
 	        {getFieldDecorator('btnColor', {
 	            rules: [
-	            	{ type: 'object', required: true, message: '请选择活动按钮的颜色值！~' }
+	            	{ type: 'object', required: true, message: '请选择活动按钮的颜色值！~' },
 	        	],
 	          })(
-	          <ColorPickerWrapped color="#ffffff" />
+	          <ColorPickerWrapped />
     		)}
         </FormItem>
 
@@ -137,21 +110,33 @@ function _PublicForm(props) {
     		)}
         </FormItem>
 
-				<FormItem {...formItemLayout} label="入口图上传">
-					{getFieldDecorator('bannerImg', {
-						rules: [{type: "object", required: true, massage: "请上传图片！~"}]
-					})(
-						<Upload listType="picture" action="/api/upload/banner" accept="image/*">
-							<Button type="ghost"><Icon type="upload" /> 上传</Button>
-						</Upload>
-					)}
-				</FormItem>
+		<FormItem {...formItemLayout} label="入口图上传">
+			{getFieldDecorator('entryImg', {
+				rules: [{type: "object", required: true, massage: "请上传入口图片！~"}]
+			})(
+				<UploadWrapped fileObj={pubFormState.entryImg}/>
+			)}
+		</FormItem>
+
+		<FormItem {...formItemLayout} label="是否开启活动">
+			{getFieldDecorator('isOpen', {
+				rules: [{type: "boolean"}],
+				initialValue: true
+			})(
+				<Switch 
+					defaultChecked={true}
+					checkedChildren="是"
+					unCheckedChildren="否"
+				/>
+			)}
+		</FormItem>
 
         <FormItem {...tailFormItemLayout}>
           <Button type="primary" htmlType="submit">保存</Button>
         </FormItem>
       </Form>
-			</div>
+
+		</div>
     );
 }
 
@@ -191,7 +176,7 @@ class ProductInputWrapped extends React.Component {
 				<Popover
 					content={<p><Icon type="info-circle" /> 多个数值请用‘|’分隔</p>}
 					title="提示"
-					placement="topLeft"
+					placement="top"
 					trigger="hover"
 				>
 					<div style={{width: '100%'}}>
@@ -204,42 +189,134 @@ class ProductInputWrapped extends React.Component {
 	}
 }
 
-// function ProductInputWrapped(props){
-// 	console.log('func', props.onChange);
-// 	return (
-// 		<div>
-// 			<Popover
-// 				content={<p><Icon type="info-circle" />多个数值请用‘|’分隔</p>}
-// 				title="提示"
-// 				placement="topLeft"
-// 				trigger="hover"
-// 			>
-// 				<div style={{width: '100%'}}>
-// 					<Input onChange={(e)=>props.onChange(e.target.value)}/>
-// 				</div>
-// 			</Popover>
-// 		</div>
-// 	);
-// }
+class UploadWrapped extends React.Component {
+	
+	state = {
+		disable: !!this.props.fileObj,
+		previewvisible: false,
+		previewImg: ''
+	}
+
+	render() {
+		//入口图片上传插件配置
+		const { disable, previewvisible, previewImg } = this.state;
+		const upLoadSetting = {
+			listType: "picture",
+			action: "/api/upload/banner",
+			accept: "image/*",
+			beforeUpload: ()=>this.beforeUpload(),
+			onChange: (params)=>this.onChange(params),
+			onRemove: ()=>this.onRemove(),
+			onPreview: (file)=>this.onPreview(file),
+			disabled: disable
+		};
+		return (
+			<div>
+				<Upload {...upLoadSetting}>
+					<Button type="ghost" onClick={()=>this.clickHdlr()}><Icon type="upload" /> 上传</Button>
+				</Upload>
+				<Modal visible={ previewvisible } footer={null} onCancel={()=>this.onClose()} width={830}>
+					<img src={ previewImg } width="100%"/>
+				</Modal>
+			</div>
+		);
+	}
+
+	beforeUpload(file, fileList){
+		if(this.state.disable){
+			notification.open({
+				duration: 6,
+				message: '错误',
+				description: '亲，入口图只能上传一张哦！~',
+				icon: <Icon type="close-circle" style={{color: 'rgb(240, 64, 50)'}}/>
+			});
+		}
+	}
+
+	onChange({file, fileList, event}){
+		if(file.status == 'done' && fileList && fileList.length > 0){
+			const data = file.response
+			if(data.code == 200){
+				this.setState({...this.state, disable: true});
+				const fileState = {
+					...file,
+					thumbUrl: '',
+					url: data.result.url
+				}
+				this.props.onChange(fileState);
+			}else{
+				//todo 错误的情况也会显示图片
+				notification.open({
+					duration: 6,
+					message: '错误',
+					description: data.result,
+					icon: <Icon type="close-circle" style={{color: 'rgb(240, 64, 50)'}}/>
+				});
+			}
+		}
+	}
+
+	clickHdlr(){
+		if(this.state.disable){
+			notification.open({
+				duration: 6,
+				message: '错误',
+				description: '亲，入口图只能上传一张哦！~',
+				icon: <Icon type="close-circle" style={{color: 'rgb(240, 64, 50)'}}/>,
+			});
+		}
+	}
+
+	//移除已上传的方法
+	onRemove(){
+		this.setState({...this.state, disable: false});
+		this.props.onChange();
+	}
+
+	//预览图片方法
+	onPreview(file){
+		this.setState({
+			...this.state,
+			previewvisible: true,
+			previewImg: file.url || file.thumbUrl
+		})
+	}	
+
+	onClose(){
+		this.setState({
+			...this.state,
+			previewvisible: false
+		})
+	}
+}
 
 
 //可以做成保存按钮
-function handleSubmit(e, validateFields) {
+function handleSubmit(e, validateFields, dispatch, pubFormState) {
     e.preventDefault();
     validateFields((err, values) => {
-    	// console.log(values);
-      if (!err) {
-        console.log('Received values of form: ', values);
-      }
+      // if (err) {
+      //   // console.log('Received values of form: ', values);
+      //   throw err;
+      // }
+      //todo 每一个专场都应该有一个对应的id 暂时写成0
+      dispatch({type: 'commStyle/saveCommState', value: pubFormState});
+
     });
 }
 
 function onFieldsChange(props, fields) {
 	const { dispatch } = props;
 	//当表格修改，记录表格state
+	const value = {};
+	for(let k in fields) {
+		if(fields[k].dirty || fields[k].validating) return; //如果是验证中的话 直接返回
+		value[k] = fields[k].value;
+	}
+
 	dispatch({
 		type: 'commStyle/updPubFormState',
-		value: fields
+		value: value,
 	});
 }
 

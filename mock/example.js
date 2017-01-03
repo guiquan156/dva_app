@@ -1,6 +1,6 @@
 'use strict';
 
-const Form = require('formidable');
+// const Form = require('formidable');
 
 const mock = {
 	total: 12,
@@ -128,32 +128,42 @@ module.exports = {
 	'POST /api/upload/banner': function (req, res) {
 		// console.log(req.body);
 
-		let form = new Form.IncomingForm();
-		form.encoding = 'utf-8';
-		form.uploadDir = 'public/upload'; //配置路劲
-		form.keepExtensions = true;	//保留扩展名
-		form.maxFieldsSize = 2 * 1024 * 1024; //不大于2M
+		// let form = new Form.IncomingForm();
+		// form.encoding = 'utf-8';
+		// form.uploadDir = 'public/upload'; //配置路劲
+		// form.keepExtensions = true;	//保留扩展名
+		// form.maxFieldsSize = 2 * 1024 * 1024; //不大于2M
 
 
 
-		form.parse(req, function(err, fields, files){
-			console.log('err', err);
-			console.log('fields', fields);
-			console.log('files', files);
+		// form.parse(req, function(err, fields, files){
+		// 	console.log('err', err);
+		// 	console.log('fields', fields);
+		// 	console.log('files', files);
 
-			// console.log(files);
-			// if(err){
-			// 	//失败
-			//
-			// 	res.end('err');
-			// 	return;
-			// }
-			// //成功
-			// res.end('success');
-		})
+		// 	// console.log(files);
+		// 	// if(err){
+		// 	// 	//失败
+		// 	//
+		// 	// 	res.end('err');
+		// 	// 	return;
+		// 	// }
+		// 	// //成功
+		// 	// res.end('success');
+		// })
 
-		res.end();
+		res.json({code: 200, result: {url: 'http://baidu.com'}});
+		// res.json({code: 201, result: 'hahah'});
+	},
 
 
+	'POST /api/saveState': function(req, res) {
+		res.json({
+			code: 200,
+			result: req.body,
+			msg: 'success'
+		});
 	}
+
+
 };
