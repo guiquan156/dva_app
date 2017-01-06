@@ -1,7 +1,21 @@
 import React from 'react';
-import { DatePicker, Form, Input, Button, Icon, InputNumber, Popover, Select, Upload, Modal, Switch, notification } from 'antd';
 import { connect } from 'dva';
 import { ColorPickerWrapped } from '../comm/colorPicker.jsx';
+import myAlert from '../comm/myAlert.jsx';
+import {
+	DatePicker,
+	Form,
+	Input,
+	Button,
+	Icon,
+	InputNumber,
+	Popover,
+	Select,
+	Upload,
+	Modal,
+	Switch,
+	notification
+} from 'antd';
 
 const Option = Select.Option;
 const formItemLayout = {
@@ -124,7 +138,7 @@ function _PublicForm(props) {
 				initialValue: true
 			})(
 				<Switch 
-					defaultChecked={true}
+					defaultChecked={pubFormState.isOpen}
 					checkedChildren="是"
 					unCheckedChildren="否"
 				/>
@@ -224,12 +238,13 @@ class UploadWrapped extends React.Component {
 
 	beforeUpload(file, fileList){
 		if(this.state.disable){
-			notification.open({
-				duration: 6,
-				message: '错误',
-				description: '亲，入口图只能上传一张哦！~',
-				icon: <Icon type="close-circle" style={{color: 'rgb(240, 64, 50)'}}/>
-			});
+			// notification.open({
+			// 	duration: 6,
+			// 	message: '错误',
+			// 	description: '亲，入口图只能上传一张哦！~',
+			// 	icon: <Icon type="close-circle" style={{color: 'rgb(240, 64, 50)'}}/>
+			// });
+			myAlert.err('亲，入口图只能上传一张哦！~');
 		}
 	}
 
@@ -246,24 +261,26 @@ class UploadWrapped extends React.Component {
 				this.props.onChange(fileState);
 			}else{
 				//todo 错误的情况也会显示图片
-				notification.open({
-					duration: 6,
-					message: '错误',
-					description: data.result,
-					icon: <Icon type="close-circle" style={{color: 'rgb(240, 64, 50)'}}/>
-				});
+				// notification.open({
+				// 	duration: 6,
+				// 	message: '错误',
+				// 	description: data.result,
+				// 	icon: <Icon type="close-circle" style={{color: 'rgb(240, 64, 50)'}}/>
+				// });
+				myAlert.err(data.result);
 			}
 		}
 	}
 
 	clickHdlr(){
 		if(this.state.disable){
-			notification.open({
-				duration: 6,
-				message: '错误',
-				description: '亲，入口图只能上传一张哦！~',
-				icon: <Icon type="close-circle" style={{color: 'rgb(240, 64, 50)'}}/>,
-			});
+			// notification.open({
+			// 	duration: 6,
+			// 	message: '错误',
+			// 	description: '亲，入口图只能上传一张哦！~',
+			// 	icon: <Icon type="close-circle" style={{color: 'rgb(240, 64, 50)'}}/>,
+			// });
+			myAlert.err('亲，入口图只能上传一张哦！~');
 		}
 	}
 

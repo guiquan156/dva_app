@@ -5,7 +5,16 @@ import {saveStyle as saveStyleServices} from '../services/commStyleServices.js';
 export default {
 	namespace: 'commStyle',
 	state: {
-		pubFormState: {}
+		pubFormState: {
+			isOpen: true
+		},
+		pcFormState: {
+			isShowListPC: false
+		},
+		wapFormState: {
+			isShowListWap: false
+
+		}
 	},
 	effects: {
 		*saveCommState({ value }, { call, put }) {
@@ -15,14 +24,17 @@ export default {
 			}else{
 				
 			}
-
-
-
 		}
 	},
 	reducers: {
 		updPubFormState(state, {value}) {
 			return {...state,  pubFormState: { ...state.pubFormState, ...value }};
+		},
+		updPcFormState(state, {value}) {
+			return {...state,  pcFormState: { ...state.pcFormState, ...value }};
+		},
+		updWapFormState(state, {value}) {
+			return {...state,  wapFormState: { ...state.wapFormState, ...value }};
 		}
 	}
 
